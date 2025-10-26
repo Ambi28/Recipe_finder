@@ -3,33 +3,60 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Recipe Finder</title>
+  <title>🍳 FlavorFind</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="container">
-    <h1>🍳 Recipe Finder</h1>
+    <h1>🍳 FlavorFind</h1>
+
+    <!-- Search -->
     <div class="search-box">
       <input type="text" id="search-input" placeholder="Search for a recipe...">
       <button id="search-btn">Search</button>
     </div>
+
+    <!-- Browse Categories -->
+    
+    <div class="categories">
+      <button class="cat-btn" data-category="Dessert">🍰 Desserts</button>
+      <button class="cat-btn" data-category="Breakfast">🥞 Breakfast</button>
+      <button class="cat-btn" data-category="Seafood">🐟 Seafood</button>
+      <button class="cat-btn" data-category="Chicken">🍗 Chicken</button>
+      <button class="cat-btn" data-category="Miscellaneous">🍫 Chocolates</button>
+      <button id="show-drinks" class="cat-btn">🥤 Juices & Milkshakes</button>
+    </div>
+
+    <!-- Search Results -->
+    <h2 id="section-title">All Recipes</h2>
     <div id="results" class="results-grid"></div>
-  </div>
+
+    
 
   <script>
     const searchBtn = document.getElementById("search-btn");
     const searchInput = document.getElementById("search-input");
     const resultsDiv = document.getElementById("results");
+    const customDiv = document.getElementById("custom-recipes");
+    const sectionTitle = document.getElementById("section-title");
 
-    async function fetchRecipes(query) {
+    // Fetch recipes by search
+    async function fetchRecipes(query = "") {
       const res = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${query}`);
       const data = await res.json();
       return data.meals;
     }
 
+    // Fetch by category
+    async function fetchByCategory(category) {
+      const res = await fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?c=${category}`);
+      const data = await res.json();
+      return data.meals;
+    }
+
+    // Display dynamic API results
     function displayResults(meals) {
       resultsDiv.innerHTML = "";
-
       if (!meals) {
         resultsDiv.innerHTML = "<p>No recipes found. Try another search!</p>";
         return;
@@ -49,23 +76,64 @@
       });
     }
 
+    // Navigate to details page
     function viewRecipe(id) {
-      // store recipe id in localStorage
       localStorage.setItem("selectedRecipe", id);
-      // go to the details page
       window.location.href = "recipe.html";
     }
 
+    // Search button
     searchBtn.addEventListener("click", async () => {
       const query = searchInput.value.trim();
       if (query) {
         const meals = await fetchRecipes(query);
         displayResults(meals);
+        sectionTitle.textContent = `Results for "${query}"`;
       }
     });
 
+    // Enter key triggers search
     searchInput.addEventListener("keypress", e => {
       if (e.key === "Enter") searchBtn.click();
+    });
+
+    // Category buttons
+    document.querySelectorAll(".cat-btn").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const category = btn.dataset.category;
+        if (!category) return;
+        const meals = await fetchByCategory(category);
+        displayResults(meals);
+        sectionTitle.textContent = `${btn.textContent} Recipes`;
+      });
+    });
+   
+
+    // Display hardcoded recipes
+    function displayCustomRecipes() {
+      customDiv.innerHTML = "";
+      customRecipes.forEach(item => {
+        const card = document.createElement("div");
+        card.classList.add("recipe-card");
+        card.innerHTML = `
+          <img src="${item.img}" alt="${item.name}">
+          <div class="recipe-info">
+            <h3>${item.name}</h3>
+            <a href="${item.link}" target="_blank" class="video-btn-small">▶ View Recipe</a>
+          </div>
+        `;
+        customDiv.appendChild(card);
+      });
+    }
+
+    // Show Juices & Shakes button
+    document.getElementById("show-drinks").addEventListener("click", displayCustomRecipes);
+
+    // Load all recipes initially
+    window.addEventListener("load", async () => {
+      const allMeals = await fetchRecipes();
+      displayResults(allMeals);
+      displayCustomRecipes(); // show drink section too
     });
   </script>
 </body>

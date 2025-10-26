@@ -17,7 +17,6 @@ h1 {
 .search-box {
   margin: 20px 0;
 }
-
 input {
   padding: 10px;
   width: 60%;
@@ -103,3 +102,56 @@ button:hover {
   border-radius: 10px;
   text-decoration: none;
 }
+.video-btn-small {
+  display: inline-block;
+  margin-top: 8px;
+  background-color: #e53935;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 0.9em;
+}
+
+.video-btn-small:hover {
+  background-color: #c62828;
+}
+
+.categories {
+  margin: 20px 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.cat-btn {
+  background-color: #ffca28;
+  border: none;
+  color: #333;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.3s;
+}
+
+.cat-btn:hover {
+  background-color: #ffa000;
+}
+
+.video-btn-small {
+  display: inline-block;
+  margin-top: 8px;
+  background-color: #e53935;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-size: 0.9em;
+}
+
+.video-btn-small:hover {
+  background-color: #c62828;
+}
+
