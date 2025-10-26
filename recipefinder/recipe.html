@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipe Details</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <button onclick="window.history.back()" class="back-btn">⬅ Back</button>
+    <div id="recipe-details"></div>
+  </div>
+
+  <script>
+    const recipeDetailsDiv = document.getElementById("recipe-details");
+
+    async function fetchRecipeById(id) {
+      const res = await fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${id}`);
+      const data = await res.json();
+      return data.meals[0];
+    }
+
+    function displayRecipe(meal) {
+      const ingredients = [];
+      for (let i = 1; i <= 20; i++) {
+        const ingredient = meal[`strIngredient${i}`];
+        const measure = meal[`strMeasure${i}`];
+        if (ingredient && ingredient.trim() !== "") {
+          ingredients.push(`${ingredient} - ${measure}`);
+        }
+      }
+
+      recipeDetailsDiv.innerHTML = `
+        <h1>${meal.strMeal}</h1>
+        <img src="${meal.strMealThumb}" alt="${meal.strMeal}">
+        <h3>Category: ${meal.strCategory}</h3>
+        <h4>Area: ${meal.strArea}</h4>
+
+        <h2>🧂 Ingredients</h2>
+        <ul>${ingredients.map(item => `<li>${item}</li>`).join("")}</ul>
+
+        <h2>👩‍🍳 Instructions</h2>
+        <p>${meal.strInstructions}</p>
+
+        <a href="${meal.strYoutube}" target="_blank" class="video-btn">▶ Watch Recipe Video</a>
+      `;
+    }
+
+    const recipeId = localStorage.getItem("selectedRecipe");
+    if (recipeId) {
+      fetchRecipeById(recipeId).then(displayRecipe);
+    } else {
+      recipeDetailsDiv.innerHTML = "<p>No recipe selected!</p>";
+    }
+  </script>
+</body>
+</html>

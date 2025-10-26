@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recipe Finder</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>🍳 Recipe Finder</h1>
+    <div class="search-box">
+      <input type="text" id="search-input" placeholder="Search for a recipe...">
+      <button id="search-btn">Search</button>
+    </div>
+    <div id="results" class="results-grid"></div>
+  </div>
+
+  <script>
+    const searchBtn = document.getElementById("search-btn");
+    const searchInput = document.getElementById("search-input");
+    const resultsDiv = document.getElementById("results");
+
+    async function fetchRecipes(query) {
+      const res = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${query}`);
+      const data = await res.json();
+      return data.meals;
+    }
+
+    function displayResults(meals) {
+      resultsDiv.innerHTML = "";
+
+      if (!meals) {
+        resultsDiv.innerHTML = "<p>No recipes found. Try another search!</p>";
+        return;
+      }
+
+      meals.forEach(meal => {
+        const card = document.createElement("div");
+        card.classList.add("recipe-card");
+        card.innerHTML = `
+          <img src="${meal.strMealThumb}" alt="${meal.strMeal}">
+          <div class="recipe-info">
+            <h3>${meal.strMeal}</h3>
+            <button onclick="viewRecipe(${meal.idMeal})">View Recipe</button>
+          </div>
+        `;
+        resultsDiv.appendChild(card);
+      });
+    }
+
+    function viewRecipe(id) {
+      // store recipe id in localStorage
+      localStorage.setItem("selectedRecipe", id);
+      // go to the details page
+      window.location.href = "recipe.html";
+    }
+
+    searchBtn.addEventListener("click", async () => {
+      const query = searchInput.value.trim();
+      if (query) {
+        const meals = await fetchRecipes(query);
+        displayResults(meals);
+      }
+    });
+
+    searchInput.addEventListener("keypress", e => {
+      if (e.key === "Enter") searchBtn.click();
+    });
+  </script>
+</body>
+</html>
